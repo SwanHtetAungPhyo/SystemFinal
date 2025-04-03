@@ -1,0 +1,49 @@
+@startuml
+
+[*] --> ApplicationSubmitted : Start Loan Process
+state ApplicationSubmitted : "Application Submitted"
+state ApplicationReview : "Application Review"
+state Underwriting : "Underwriting"
+state Approved : "Approved"
+state Rejected : "Rejected"
+state DocumentationAgreement : "Documentation & Agreement"
+state Disbursed : "Disbursed"
+state RepaymentInProgress : "Repayment In Progress"
+state Delinquent : "Delinquent"
+state Default : "Default"
+state Collections : "Collections"
+state ClosedPaid : "Closed (Paid)"
+state ClosedDefault : "Closed (Default)"
+state ClosedRejected : "Closed (Rejected)"
+state ClosedExpired : "Closed (Expired)"
+
+ApplicationSubmitted --> ApplicationReview : Application Received
+ApplicationReview --> ApplicationSubmitted : Incomplete Application\n(resubmit)
+ApplicationReview --> Underwriting : Application Complete
+Underwriting --> Approved : Approval Granted
+Underwriting --> Rejected : Application Rejected
+Approved --> DocumentationAgreement : Proceed to Documentation
+DocumentationAgreement --> Disbursed : Documents Signed & Verified
+DocumentationAgreement --> ClosedExpired : Offer Expired\n(30 days)
+Disbursed --> RepaymentInProgress : Repayment Schedule Started
+RepaymentInProgress --> ClosedPaid : Loan Fully Repaid
+RepaymentInProgress --> Delinquent : Payment Missed
+Delinquent --> RepaymentInProgress : Payment Received\n(catch-up)
+Delinquent --> Default : Multiple Payments Missed\n(90+ days)
+Default --> Collections : Default Detected
+Collections --> ClosedDefault : Collections Completed\n(partial/full recovery)
+Rejected --> ClosedRejected : Finalize Rejection
+
+ClosedPaid --> [*]
+ClosedDefault --> [*]
+ClosedRejected --> [*]
+ClosedExpired --> [*]
+
+note right of DocumentationAgreement
+  **Expiration Logic**:
+  If customer fails to sign
+  documents within 30 days,
+  the offer expires.
+end note
+
+@enduml
